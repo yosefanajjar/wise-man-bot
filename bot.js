@@ -12,7 +12,11 @@ http.createServer((req, res) => {
     });
         res.write(`server started running at ${Date.now()}`);
         res.end();
-    }).listen(port);
+}).listen(port);
+
+setInterval(() => {
+    http.get('http://wise-man-bot.herokuapp.com/');
+}, 1200000);
 
 const quoteOfTheDay = async () => {
     let quote, author;
