@@ -1,8 +1,18 @@
+const http = require('http');
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const auth = require('./auth.json');
 const axios = require('axios');
 require('dotenv').config();
+
+const port = process.env.PORT || 4000;
+
+http.createServer((req, res) => {
+    res.writeHead(200, {
+        'Content-type': 'text/plain'
+    });
+        res.write(`server started running at ${Date.now()}`);
+        res.end();
+    }).listen(port);
 
 const quoteOfTheDay = async () => {
     let quote, author;
