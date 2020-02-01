@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const auth = require('./auth.json');
 const axios = require('axios');
+require('dotenv').config();
 
 const quoteOfTheDay = async () => {
     let quote, author;
@@ -33,4 +34,4 @@ client.on('message', async msg => {
     }
 })
 
-client.login(auth.token);
+client.login(process.env.TOKEN);
