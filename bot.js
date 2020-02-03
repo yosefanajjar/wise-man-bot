@@ -10,8 +10,8 @@ http.createServer((req, res) => {
     res.writeHead(200, {
         'Content-type': 'text/plain'
     });
-        res.write(`server started running at ${Date.now()}`);
-        res.end();
+    res.write(`server started running at ${Date.now()}`);
+    res.end();
 }).listen(port);
 
 setInterval(() => {
@@ -24,21 +24,21 @@ const quoteOfTheDay = async () => {
         const { data } = await axios.get('https://api.quotable.io/random');
         quote = data.content;
         author = data.author;
-        return  `“${quote}” by ${author}`;    
+        return `“${quote}” by ${author}`;
     } catch (error) {
         console.log(error);
     }
 }
 
-client.on('ready', async  () => {
+client.on('ready', async () => {
     // Welcome message for starting the bot
     console.log(`logged in as ${client.user.tag}!`);
-     
-    if (new Date().getHours() === 10) {
+
+    setInterval(() => {
         const quote = await quoteOfTheDay();
         const generalChannelId = client.channels.find(channel => channel.name === 'general').id;
         client.channels.get(generalChannelId).send(quote);
-    }
+    }, 86400000);
 })
 
 client.on('message', async msg => {
