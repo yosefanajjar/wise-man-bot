@@ -30,11 +30,11 @@ const quoteOfTheDay = async () => {
     }
 }
 
-client.on('ready', async () => {
+client.on('ready', () => {
     // Welcome message for starting the bot
     console.log(`logged in as ${client.user.tag}!`);
 
-    setInterval(() => {
+    setInterval(async () => {
         const quote = await quoteOfTheDay();
         const generalChannelId = client.channels.find(channel => channel.name === 'general').id;
         client.channels.get(generalChannelId).send(quote);
