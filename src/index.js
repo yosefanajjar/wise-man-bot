@@ -1,51 +1,51 @@
-const http = require("http");
-const Discord = require("discord.js");
-const client = new Discord.Client();
-const axios = require("axios");
-require("dotenv").config();
+import "dotenv/config";
+import express from "express";
+import { InteractionType, InteractionResponseType } from "discord-interactions";
+import { VerifyDiscordRequest, InstallGlobalCommands } from "./utils.js";
+import { ALL_COMMANDS } from "./commands.js";
 
-const port = process.env.PORT || 4000;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-http
-  .createServer((req, res) => {
-    res.writeHead(200, {
-      "Content-type": "text/plain",
-    });
-    res.write(`server started running at ${Date.now()}`);
-    res.end();
-  })
-  .listen(port);
+// Parse request body and verifies incoming requests using discord-interactions package
+app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 
-const quoteOfTheDay = async () => {
-  let quote, author;
-  try {
-    const { data } = await axios.get("https://api.quotable.io/random");
-    quote = data.content;
-    author = data.author;
-    return `“${quote}” by ${author}`;
-  } catch (error) {
-    console.log(error);
+/**
+ * Interactions endpoint URL where Discord will send HTTP requests
+ */
+app.post("/interactions", async function (req, res) {
+  // Interaction type and data
+  const { type, data } = req.body;
+
+  /**
+   * Handle verification requests
+   */
+  if (type === InteractionType.PING) {
+    return res.send({ type: InteractionResponseType.PONG });
   }
-};
 
-client.on("ready", () => {
-  // Welcome message for starting the bot
-  console.log(`logged in as ${client.user.tag}!`);
+  /**
+   * Handle slash command requests
+   * See https://discord.com/developers/docs/interactions/application-commands#slash-commands
+   */
+  if (type === InteractionType.APPLICATION_COMMAND) {
+    const { name } = data;
 
-  setInterval(async () => {
-    const quote = await quoteOfTheDay();
-    const generalChannelId = client.channels.find(
-      (channel) => channel.name === "general"
-    ).id;
-    client.channels.get(generalChannelId).send(quote);
-  }, 86400000);
-});
-
-client.on("message", async (msg) => {
-  if (msg.content === "/quote") {
-    const quote = await quoteOfTheDay();
-    msg.reply(quote);
+    if (name === "quote") {
+      const quote = await quoteOfTheDay();
+      // Send a message into the channel where command was triggered from
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: quote,
+        },
+      });
+    }
   }
 });
 
-client.login(process.env.TOKEN);
+app.listen(PORT, () => {
+  console.log("Listening on port", PORT);
+
+  InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
+});
