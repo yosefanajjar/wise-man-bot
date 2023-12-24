@@ -21,7 +21,7 @@ export async function DiscordRequest(endpoint, options) {
   // Stringify payloads
   if (options.body) options.body = JSON.stringify(options.body);
   // Use node-fetch to make requests
-  const res = await axios.get(url, {
+  const res = await fetch(url, {
     headers: {
       Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
       "Content-Type": "application/json; charset=UTF-8",
@@ -31,9 +31,10 @@ export async function DiscordRequest(endpoint, options) {
     ...options,
   });
   // throw API errors
-  if (res.status !== 200) {
+  if (!res.ok) {
+    const data = await res.json();
     console.log(res.status);
-    throw new Error(JSON.stringify(res.data));
+    throw new Error(JSON.stringify(data));
   }
   // return original response
   return res;
