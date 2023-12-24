@@ -3,14 +3,17 @@ import express from "express";
 import { InteractionType, InteractionResponseType } from "discord-interactions";
 import { VerifyDiscordRequest, InstallGlobalCommands } from "./utils.js";
 import { ALL_COMMANDS } from "./commands.js";
+import bodyParser from "body-parser";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Parse request body and verifies incoming requests using discord-interactions package
-app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
+app.use(
+  bodyParser.raw({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) })
+);
 
-/**
+/**`
  * Interactions endpoint URL where Discord will send HTTP requests
  */
 app.post("/interactions", async function (req, res) {
@@ -43,6 +46,10 @@ app.post("/interactions", async function (req, res) {
     }
   }
 });
+
+app.get("/", (req, res) =>
+  res.json({ status: 200, message: "Wise Man Bot API" })
+);
 
 app.listen(PORT, () => {
   console.log("Listening on port", PORT);
