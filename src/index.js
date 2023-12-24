@@ -1,17 +1,13 @@
 import "dotenv/config";
 import express from "express";
 import { InteractionType, InteractionResponseType } from "discord-interactions";
-import { VerifyDiscordRequest, InstallGlobalCommands } from "./utils.js";
-import { ALL_COMMANDS } from "./commands.js";
-import bodyParser from "body-parser";
+import { VerifyDiscordRequest, quoteOfTheDay } from "./utils.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Parse request body and verifies incoming requests using discord-interactions package
-app.use(
-  bodyParser.raw({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) })
-);
+app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 
 /**`
  * Interactions endpoint URL where Discord will send HTTP requests
@@ -53,6 +49,4 @@ app.get("/", (req, res) =>
 
 app.listen(PORT, () => {
   console.log("Listening on port", PORT);
-
-  InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
 });

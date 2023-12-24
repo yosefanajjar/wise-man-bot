@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { InstallGlobalCommands } from "./utils.js";
 
 // Command containing options
 const GET_QUOTE_COMMAND = {
@@ -7,3 +8,5 @@ const GET_QUOTE_COMMAND = {
 };
 
 export const ALL_COMMANDS = [GET_QUOTE_COMMAND];
+
+InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
